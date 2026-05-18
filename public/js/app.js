@@ -108,8 +108,8 @@ function advanceCard(grade) {
 function render() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + state.screen)?.classList.add('active');
-  if (state.screen === 'setup') renderSetup();
-  else if (state.screen === 'drill') renderDrill();
+  if (state.screen === 'setup')    renderSetup();
+  else if (state.screen === 'drill')    renderDrill();
   else if (state.screen === 'complete') renderComplete();
 }
 
@@ -320,6 +320,26 @@ function toggleNotes() {
 
 function goSetup() { state.screen = 'setup'; render(); }
 
+function goHome() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-home')?.classList.add('active');
+  updateHomeProgress();
+}
+
+function updateHomeProgress() {
+  const el = document.getElementById('home-progress');
+  if (!el) return;
+  const total = CHORDS.length;
+  const mastered = CHORDS.filter(c => masteryLevel(c.name) === 'mastered').length;
+  const nrStudied = Object.values(nrState?.progress || {}).filter(p => p.total > 0).length;
+  const nrTotal = STAFF_NOTES.length;
+
+  el.innerHTML = `
+    <div class="home-stat"><span class="hs-val">${mastered}/${total}</span><span class="hs-lbl">chords mastered</span></div>
+    <div class="home-stat"><span class="hs-val">${nrStudied}/${nrTotal}</span><span class="hs-lbl">notes studied</span></div>
+  `;
+}
+
 function resetProgress() {
   if (!confirm('Reset all your practice history? This cannot be undone.')) return;
   state.progress = {};
@@ -400,8 +420,24 @@ document.addEventListener('click', e => {
 document.addEventListener('DOMContentLoaded', () => {
   state.progress = loadProgress();
   buildGlossaryPanel();
-  render();
+  initNoteReading();
+  updateHomeProgress();
 
+  // The app starts on screen-home (set active in HTML)
+  // Chord drill state starts at 'setup' but we don't render it until navigated
+
+  // Home navigation
+  document.getElementById('go-note-reading')?.addEventListener('click', () => {
+    nrState.screen = 'home';
+    nrRender();
+  });
+  document.getElementById('go-chord-drill')?.addEventListener('click', () => {
+    state.progress = loadProgress();
+    state.screen = 'setup';
+    render();
+  });
+
+  // Chord drill wiring
   document.getElementById('btn-start')?.addEventListener('click', startSession);
   document.getElementById('btn-reveal')?.addEventListener('click', revealDiagram);
   document.getElementById('btn-gotit')?.addEventListener('click', () => advanceCard('gotit'));
@@ -409,12 +445,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-stilll')?.addEventListener('click', () => advanceCard('stilll'));
   document.getElementById('btn-back')?.addEventListener('click', goSetup);
   document.getElementById('btn-again')?.addEventListener('click', () => { state.screen = 'setup'; render(); });
+  document.getElementById('btn-complete-home')?.addEventListener('click', goHome);
   document.getElementById('btn-reset-progress')?.addEventListener('click', resetProgress);
   document.getElementById('btn-notes-toggle')?.addEventListener('click', toggleNotes);
+  document.getElementById('chord-drill-home')?.addEventListener('click', goHome);
+
+  // Glossary
   document.getElementById('btn-glossary')?.addEventListener('click', showGlossary);
   document.getElementById('glossary-close')?.addEventListener('click', hideGlossary);
   document.getElementById('glossary-overlay')?.addEventListener('click', hideGlossary);
 
+  // Chord drill path toggle
   document.getElementById('path-beginner')?.addEventListener('click', () => {
     state.useBeginnerPath = true;
     document.getElementById('path-beginner').classList.add('active');

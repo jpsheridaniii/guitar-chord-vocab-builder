@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChordDrill — Guitar Chord Vocabulary Builder</title>
+<title>ChordDrill — Guitar Theory Trainer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,22 +12,71 @@
 <body>
 
 <header>
-  <div class="logo">Chord<span>Drill</span></div>
+  <div class="logo">ChordDrill</div>
   <button class="btn-text" id="btn-glossary">📖 Glossary</button>
 </header>
 
-<!-- ── Setup screen ──────────────────────────────────────────────────────── -->
-<div class="screen active" id="screen-setup">
-  <h1 class="setup-heading">Practice Chords</h1>
-  <p class="setup-sub">Select categories, choose your path, then start drilling. Theory is explained on every reveal.</p>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     HOME — mode selector
+     ══════════════════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="home-hero">
+    <h1 class="home-title">Guitar Theory Trainer</h1>
+    <p class="home-sub">Built to help you reach the level to sight-read <em>Melodic Rhythms for Guitar</em>.</p>
+  </div>
+
+  <div class="mode-grid">
+    <button class="mode-card primary-mode" id="go-note-reading">
+      <div class="mode-icon">🎵</div>
+      <div class="mode-info">
+        <div class="mode-title">Note Reading</div>
+        <div class="mode-desc">Learn treble clef from scratch — the foundation of all sight-reading. Guided lessons + flash drills.</div>
+        <div class="mode-tag">Start here if you're new</div>
+      </div>
+    </button>
+
+    <button class="mode-card" id="go-chord-drill">
+      <div class="mode-icon">🎸</div>
+      <div class="mode-info">
+        <div class="mode-title">Chord Drill</div>
+        <div class="mode-desc">Flashcard drill with theory — chord formulas, key context, note names on fretboard.</div>
+      </div>
+    </button>
+  </div>
+
+  <div class="home-progress-bar" id="home-progress"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     NOTE READING — lessons + drill (rendered dynamically by note-reading.js)
+     ══════════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-note-reading">
+  <div id="nr-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     CHORD DRILL — setup
+     ══════════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-setup">
+  <div class="nr-topbar">
+    <button class="nr-back-link" id="chord-drill-home">← Home</button>
+  </div>
+
+  <h2 class="setup-heading">Chord Drill</h2>
+  <p class="setup-sub">Select categories, pick your path, then drill. Theory shown on every reveal.</p>
 
   <div class="section-label" style="margin-bottom:8px">Learning path</div>
-  <div class="path-toggle" style="margin-bottom:24px">
+  <div class="path-toggle">
     <button class="path-btn active" id="path-beginner">⭐ Beginner Path</button>
     <button class="path-btn" id="path-shuffle">🔀 Shuffle</button>
   </div>
 
-  <div class="section-label">Categories <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8;font-size:11px">(leave all unselected to drill everything)</span></div>
+  <div class="section-label" style="margin-top:20px">
+    Categories
+    <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8;font-size:11px;margin-left:6px">
+      (leave all unselected to drill everything)
+    </span>
+  </div>
   <div id="category-grid"></div>
 
   <div id="progress-summary"></div>
@@ -38,7 +87,9 @@
   </div>
 </div>
 
-<!-- ── Drill screen ───────────────────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════════════════
+     CHORD DRILL — active drill
+     ══════════════════════════════════════════════════════════════════════ -->
 <div class="screen" id="screen-drill">
   <div class="drill-header">
     <button class="back-btn" id="btn-back" title="Back to setup">&#8592;</button>
@@ -54,7 +105,7 @@
       <span id="mastery-badge" class="mastery-badge level-new">New</span>
     </div>
     <div id="chord-name">C</div>
-    <div class="prompt-hint">Form the shape in your head, then reveal the diagram.</div>
+    <div class="prompt-hint">Form the shape, then reveal.</div>
   </div>
 
   <div class="diagram-toolbar" id="diagram-toolbar">
@@ -70,31 +121,28 @@
 
   <div id="answer-section" class="hidden">
     <div class="answer-btns">
-      <button class="btn-answer btn-gotit" id="btn-gotit">
-        Got it! ✓
-        <span class="btn-shortcut">press 1</span>
-      </button>
-      <button class="btn-answer btn-getting" id="btn-getting">
-        Getting there
-        <span class="btn-shortcut">press 2</span>
-      </button>
-      <button class="btn-answer btn-stilll" id="btn-stilll">
-        Still learning ↩
-        <span class="btn-shortcut">press 3</span>
-      </button>
+      <button class="btn-answer btn-gotit"   id="btn-gotit">Got it! ✓<span class="btn-shortcut">1</span></button>
+      <button class="btn-answer btn-getting" id="btn-getting">Getting there<span class="btn-shortcut">2</span></button>
+      <button class="btn-answer btn-stilll"  id="btn-stilll">Still learning ↩<span class="btn-shortcut">3</span></button>
     </div>
     <div class="keyboard-hint">
-      <kbd>Space</kbd> reveal &nbsp; <kbd>1</kbd> got it &nbsp; <kbd>2</kbd> getting there &nbsp; <kbd>3</kbd> still learning &nbsp; <kbd>N</kbd> toggle notes
+      <kbd>Space</kbd> reveal &nbsp;
+      <kbd>1</kbd> got it &nbsp;
+      <kbd>2</kbd> getting there &nbsp;
+      <kbd>3</kbd> still learning &nbsp;
+      <kbd>N</kbd> toggle notes
     </div>
   </div>
 </div>
 
-<!-- ── Complete screen ────────────────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════════════════
+     CHORD DRILL — session complete
+     ══════════════════════════════════════════════════════════════════════ -->
 <div class="screen" id="screen-complete">
   <div class="complete-card">
     <div class="complete-icon">🎸</div>
     <div class="complete-title">Session Complete!</div>
-    <div class="complete-sub">Every chord drilled. Keep at it — the shapes will stick.</div>
+    <div class="complete-sub">Keep at it — the shapes will stick.</div>
     <div class="complete-stats">
       <div class="stat-block">
         <div class="stat-num" id="complete-total">0</div>
@@ -112,11 +160,14 @@
     <div id="complete-mastered"></div>
     <div class="complete-actions">
       <button class="btn-primary" id="btn-again">Drill Again</button>
+      <button class="btn-ghost" id="btn-complete-home">Home</button>
     </div>
   </div>
 </div>
 
-<!-- ── Glossary panel ─────────────────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════════════════
+     GLOSSARY
+     ══════════════════════════════════════════════════════════════════════ -->
 <div id="glossary-overlay"></div>
 <div id="glossary-panel">
   <div class="glossary-header">
@@ -129,6 +180,8 @@
 <script src="js/theory.js"></script>
 <script src="js/chords.js"></script>
 <script src="js/renderer.js"></script>
+<script src="js/staff.js"></script>
+<script src="js/note-reading.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
