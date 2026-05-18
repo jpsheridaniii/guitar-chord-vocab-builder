@@ -3,10 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guitar Chord Vocabulary Builder</title>
+<title>ChordDrill — Guitar Chord Vocabulary Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <h1>Guitar Chord Vocabulary Builder</h1>
-  <p>Coming soon.</p>
+
+<header>
+  <div class="logo">Chord<span>Drill</span></div>
+  <button class="btn-text" id="btn-glossary">📖 Glossary</button>
+</header>
+
+<!-- ── Setup screen ──────────────────────────────────────────────────────── -->
+<div class="screen active" id="screen-setup">
+  <h1 class="setup-heading">Practice Chords</h1>
+  <p class="setup-sub">Select categories, choose your path, then start drilling. Theory is explained on every reveal.</p>
+
+  <div class="section-label" style="margin-bottom:8px">Learning path</div>
+  <div class="path-toggle" style="margin-bottom:24px">
+    <button class="path-btn active" id="path-beginner">⭐ Beginner Path</button>
+    <button class="path-btn" id="path-shuffle">🔀 Shuffle</button>
+  </div>
+
+  <div class="section-label">Categories <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8;font-size:11px">(leave all unselected to drill everything)</span></div>
+  <div id="category-grid"></div>
+
+  <div id="progress-summary"></div>
+
+  <div class="setup-actions">
+    <button class="btn-primary" id="btn-start">Start Session</button>
+    <button class="btn-ghost" id="btn-reset-progress">Reset Progress</button>
+  </div>
+</div>
+
+<!-- ── Drill screen ───────────────────────────────────────────────────────── -->
+<div class="screen" id="screen-drill">
+  <div class="drill-header">
+    <button class="back-btn" id="btn-back" title="Back to setup">&#8592;</button>
+    <div class="progress-bar-wrap">
+      <div id="progress-bar" style="width:0%"></div>
+    </div>
+    <div id="progress-label">0 done · 0 left</div>
+  </div>
+
+  <div class="chord-prompt">
+    <div class="prompt-meta">
+      <span id="chord-category"></span>
+      <span id="mastery-badge" class="mastery-badge level-new">New</span>
+    </div>
+    <div id="chord-name">C</div>
+    <div class="prompt-hint">Form the shape in your head, then reveal the diagram.</div>
+  </div>
+
+  <div class="diagram-toolbar" id="diagram-toolbar">
+    <button class="btn-toggle" id="btn-notes-toggle">Show notes</button>
+  </div>
+
+  <div id="diagram-area"></div>
+  <div id="theory-strip"></div>
+
+  <div id="reveal-section">
+    <button class="btn-reveal-full" id="btn-reveal">Show diagram &amp; theory ↓</button>
+  </div>
+
+  <div id="answer-section" class="hidden">
+    <div class="answer-btns">
+      <button class="btn-answer btn-gotit" id="btn-gotit">
+        Got it! ✓
+        <span class="btn-shortcut">press 1</span>
+      </button>
+      <button class="btn-answer btn-getting" id="btn-getting">
+        Getting there
+        <span class="btn-shortcut">press 2</span>
+      </button>
+      <button class="btn-answer btn-stilll" id="btn-stilll">
+        Still learning ↩
+        <span class="btn-shortcut">press 3</span>
+      </button>
+    </div>
+    <div class="keyboard-hint">
+      <kbd>Space</kbd> reveal &nbsp; <kbd>1</kbd> got it &nbsp; <kbd>2</kbd> getting there &nbsp; <kbd>3</kbd> still learning &nbsp; <kbd>N</kbd> toggle notes
+    </div>
+  </div>
+</div>
+
+<!-- ── Complete screen ────────────────────────────────────────────────────── -->
+<div class="screen" id="screen-complete">
+  <div class="complete-card">
+    <div class="complete-icon">🎸</div>
+    <div class="complete-title">Session Complete!</div>
+    <div class="complete-sub">Every chord drilled. Keep at it — the shapes will stick.</div>
+    <div class="complete-stats">
+      <div class="stat-block">
+        <div class="stat-num" id="complete-total">0</div>
+        <div class="stat-lbl">Chords drilled</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num" id="complete-gotit">0</div>
+        <div class="stat-lbl">Got it</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num" id="complete-pct">0%</div>
+        <div class="stat-lbl">Success rate</div>
+      </div>
+    </div>
+    <div id="complete-mastered"></div>
+    <div class="complete-actions">
+      <button class="btn-primary" id="btn-again">Drill Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Glossary panel ─────────────────────────────────────────────────────── -->
+<div id="glossary-overlay"></div>
+<div id="glossary-panel">
+  <div class="glossary-header">
+    <span class="glossary-title">Music Theory Glossary</span>
+    <button class="glossary-close-btn" id="glossary-close">✕</button>
+  </div>
+  <div id="glossary-list"></div>
+</div>
+
+<script src="js/theory.js"></script>
+<script src="js/chords.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
